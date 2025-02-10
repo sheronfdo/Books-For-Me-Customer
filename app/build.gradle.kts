@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -46,5 +47,16 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation("com.google.firebase:firebase-firestore:25.1.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    compileOnly("org.projectlombok:lombok:1.18.36")
+    annotationProcessor("org.projectlombok:lombok:1.18.36")
+    implementation("com.google.code.gson:gson:2.12.1")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("org.modelmapper:modelmapper:3.2.2")
+    implementation("com.google.firebase:firebase-storage:21.0.1")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
+    implementation("androidx.cardview:cardview:1.0.0")
 
 }
