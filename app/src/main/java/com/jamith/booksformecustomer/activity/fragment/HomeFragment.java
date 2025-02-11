@@ -1,66 +1,104 @@
 package com.jamith.booksformecustomer.activity.fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.adapter.BookAdapter;
+import com.jamith.booksformecustomer.adapter.CarouselAdapter;
+import com.jamith.booksformecustomer.adapter.CategoryAdapter;
+import com.jamith.booksformecustomer.model.BookItem;
+import com.jamith.booksformecustomer.model.Category;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class HomeFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private List<String> carouselImages;
+    private List<Category> categories;
+    private List<BookItem> featuredBooks, newArrivals, category1Books, category2Books, category3Books;
+    RecyclerView categoriesRecyclerView;
+    RecyclerView featuredBooksRecyclerView;
+    ViewPager2 carouselView;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        carouselImages = new ArrayList<>();
+        categories = new ArrayList<>();
+        featuredBooks = new ArrayList<>();
+        newArrivals = new ArrayList<>();
+        category1Books = new ArrayList<>();
+        category2Books = new ArrayList<>();
+        category3Books = new ArrayList<>();
+
+
+        carouselView = view.findViewById(R.id.carousel_view);
+        carouselImages.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
+        carouselImages.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
+        carouselImages.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
+
+        CarouselAdapter carouselAdapter = new CarouselAdapter(carouselImages);
+        carouselView.setAdapter(carouselAdapter);
+        categoriesRecyclerView = view.findViewById(R.id.categories_scroll_view);
+        categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        // Fetch categories from Firestore
+        db.collection("categories")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Category category = document.toObject(Category.class);
+                            categories.add(category);
+                        }
+                        CategoryAdapter categoryAdapter = new CategoryAdapter(categories);
+                        categoriesRecyclerView.setAdapter(categoryAdapter);
+                    } else {
+                        // Handle error
+                    }
+                });
+
+        featuredBooksRecyclerView = view.findViewById(R.id.featured_books_recycler_view);
+        featuredBooksRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        // Fetch featured books from Firestore
+        db.collection("books")
+                .whereEqualTo("featured", true)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            BookItem book = document.toObject(BookItem.class);
+                            featuredBooks.add(book);
+                        }
+                        BookAdapter featuredBooksAdapter = new BookAdapter(featuredBooks);
+                        featuredBooksRecyclerView.setAdapter(featuredBooksAdapter);
+                    } else {
+                        // Handle error
+                    }
+                });
+
+        return view;
     }
+
+
 }

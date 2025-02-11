@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -13,6 +12,7 @@
             android:id="@+id/search_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
@@ -24,6 +24,7 @@
                 android:id="@+id/search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="8dp"
                 android:hint="Search" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -31,6 +32,7 @@
             android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="Search"
@@ -41,33 +43,27 @@
             android:id="@+id/carousel_view"
             android:layout_width="0dp"
             android:layout_height="200dp"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_layout" />
 
-        <HorizontalScrollView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/categories_scroll_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/carousel_view">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- Add category items here dynamically -->
-            </LinearLayout>
-        </HorizontalScrollView>
+            app:layout_constraintTop_toBottomOf="@+id/carousel_view" />
 
         <TextView
             android:id="@+id/featured_books_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:text="Featured Books"
             android:textSize="18sp"
@@ -79,6 +75,7 @@
             android:id="@+id/featured_books_recycler_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,6 +85,7 @@
             android:id="@+id/new_arrivals_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:text="New Arrivals"
             android:textSize="18sp"
@@ -99,6 +97,7 @@
             android:id="@+id/new_arrivals_recycler_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -108,6 +107,7 @@
             android:id="@+id/category_1_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:text="Category 1"
             android:textSize="18sp"
@@ -119,6 +119,7 @@
             android:id="@+id/category_1_recycler_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -128,6 +129,7 @@
             android:id="@+id/category_2_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:text="Category 2"
             android:textSize="18sp"
@@ -139,6 +141,7 @@
             android:id="@+id/category_2_recycler_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -148,6 +151,7 @@
             android:id="@+id/category_3_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="16dp"
             android:text="Category 3"
             android:textSize="18sp"
@@ -159,6 +163,7 @@
             android:id="@+id/category_3_recycler_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
