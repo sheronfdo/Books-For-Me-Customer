@@ -166,7 +166,7 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
 //                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(ProfileDetailConfirmActivity.this, "Seller registered successfully!", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(ProfileDetailConfirmActivity.this, MainActivity.class);
+                    Intent intent = new Intent(ProfileDetailConfirmActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
                 });

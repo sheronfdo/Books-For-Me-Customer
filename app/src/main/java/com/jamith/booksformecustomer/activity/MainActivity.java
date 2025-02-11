@@ -47,8 +47,12 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        buttonGoogle = findViewById(R.id.googleSignInButton);
         firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+        }
+        buttonGoogle = findViewById(R.id.googleSignInButton);
         firebaseFirestore = FirebaseFirestore.getInstance();
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
@@ -87,23 +91,30 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
                     if (user != null) {
-                        String displayName = user.getDisplayName();
-                        String email = user.getEmail();
-                        Uri photoUrl = user.getPhotoUrl();
-                        String number = user.getPhoneNumber();
-                        String uid = user.getUid();
+                        firebaseFirestore.collection("customers").document(user.getUid()).get().addOnSuccessListener(customer -> {
+                            if (customer.exists()) {
+                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                            } else {
+                                String displayName = user.getDisplayName();
+                                String email = user.getEmail();
+                                Uri photoUrl = user.getPhotoUrl();
+                                String number = user.getPhoneNumber();
+                                String uid = user.getUid();
 
-                        Intent intent = new Intent(MainActivity.this, ProfileDetailConfirmActivity.class);
-                        intent.putExtra("displayName", displayName);
-                        intent.putExtra("email", email);
-                        if (photoUrl != null) {
-                            intent.putExtra("photoUrl", photoUrl.toString());
-                        }
-                        if (number != null) {
-                            intent.putExtra("phoneNumber", number.toString());
-                        }
-                        intent.putExtra("uid", uid);
-                        startActivity(intent);
+                                Intent intent = new Intent(MainActivity.this, ProfileDetailConfirmActivity.class);
+                                intent.putExtra("displayName", displayName);
+                                intent.putExtra("email", email);
+                                if (photoUrl != null) {
+                                    intent.putExtra("photoUrl", photoUrl.toString());
+                                }
+                                if (number != null) {
+                                    intent.putExtra("phoneNumber", number.toString());
+                                }
+                                intent.putExtra("uid", uid);
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             }
