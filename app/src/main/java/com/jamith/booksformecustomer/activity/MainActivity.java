@@ -1,8 +1,8 @@
-package com.jamith.booksformecustomer;
+package com.jamith.booksformecustomer.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamith.booksformecustomer.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,8 +85,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                    Log.d("user", firebaseUser.getUid().toString());
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user != null) {
+                        String displayName = user.getDisplayName();
+                        String email = user.getEmail();
+                        Uri photoUrl = user.getPhotoUrl();
+                        String number = user.getPhoneNumber();
+                        String uid = user.getUid();
+
+                        Intent intent = new Intent(MainActivity.this, ProfileDetailConfirmActivity.class);
+                        intent.putExtra("displayName", displayName);
+                        intent.putExtra("email", email);
+                        if (photoUrl != null) {
+                            intent.putExtra("photoUrl", photoUrl.toString());
+                        }
+                        if (number != null) {
+                            intent.putExtra("phoneNumber", number.toString());
+                        }
+                        intent.putExtra("uid", uid);
+                        startActivity(intent);
+                    }
                 }
             }
         });
