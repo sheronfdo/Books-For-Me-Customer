@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.adapter.BookAdapter;
@@ -29,6 +30,10 @@ public class HomeFragment extends Fragment {
     private List<BookItem> featuredBooks, newArrivals, category1Books, category2Books, category3Books;
     RecyclerView categoriesRecyclerView;
     RecyclerView featuredBooksRecyclerView;
+    RecyclerView newArrivalRecyclerView;
+    RecyclerView category1RecyclerView;
+    RecyclerView category2RecyclerView;
+    RecyclerView category3RecyclerView;
     ViewPager2 carouselView;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -97,6 +102,78 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
+        newArrivalRecyclerView = view.findViewById(R.id.new_arrivals_recycler_view);
+        newArrivalRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        db.collection("books")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(10)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            BookItem book = document.toObject(BookItem.class);
+                            newArrivals.add(book);
+                        }
+                        BookAdapter newArrivalsAdapter = new BookAdapter(newArrivals);
+                        newArrivalRecyclerView.setAdapter(newArrivalsAdapter);
+                    } else {
+                        // Handle error
+                    }
+                });
+        category1RecyclerView = view.findViewById(R.id.category_1_recycler_view);
+        category1RecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        db.collection("books")
+                .whereEqualTo("category", "fiction")
+                .limit(10)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            BookItem book = document.toObject(BookItem.class);
+                            category1Books.add(book);
+                        }
+                        BookAdapter category1Adapter = new BookAdapter(category1Books);
+                        category1RecyclerView.setAdapter(category1Adapter);
+                    } else {
+                        // Handle error
+                    }
+                });
+        category2RecyclerView = view.findViewById(R.id.category_2_recycler_view);
+        category2RecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        db.collection("books")
+                .whereEqualTo("category", "biography")
+                .limit(10)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            BookItem book = document.toObject(BookItem.class);
+                            category2Books.add(book);
+                        }
+                        BookAdapter category2Adapter = new BookAdapter(category2Books);
+                        category2RecyclerView.setAdapter(category2Adapter);
+                    } else {
+                        // Handle error
+                    }
+                });
+        category3RecyclerView = view.findViewById(R.id.category_3_recycler_view);
+        category3RecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false)); db.collection("books")
+                .whereEqualTo("category", "cookbook")
+                .limit(10)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            BookItem book = document.toObject(BookItem.class);
+                            category3Books.add(book);
+                        }
+                        BookAdapter category3Adapter = new BookAdapter(category3Books);
+                        category3RecyclerView.setAdapter(category3Adapter);
+                    } else {
+                        // Handle error
+                    }
+                });
         return view;
     }
 
