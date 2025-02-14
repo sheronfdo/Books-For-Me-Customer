@@ -113,7 +113,7 @@ public class BookDetailsActivity extends AppCompatActivity {
 
         // Set click listeners
         addToCartButton.setOnClickListener(v -> {
-
+            addToCart(bookItem);
         });
 
         buyNowButton.setOnClickListener(v -> {
@@ -134,8 +134,8 @@ public class BookDetailsActivity extends AppCompatActivity {
         cartItem.put("bookStockId", book.getBookStockId());
         cartItem.put("createdAt", FieldValue.serverTimestamp());
 
-        db.collection("users").document(userId).collection("cart")
-                .document(book.getBookId())
+        db.collection("customers").document(userId).collection("cart")
+                .document(book.getBookStockId())
                 .set(cartItem)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(BookDetailsActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
