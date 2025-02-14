@@ -119,7 +119,7 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
             Uri selectedImageUri = data.getData();
             Glide.with(this).load(selectedImageUri).into(profileImageView);
             currentImageUri = selectedImageUri;
-            googleImage =false;
+            googleImage = false;
         }
     }
 
@@ -135,7 +135,7 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
         if (currentImageUri == null) {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
             return;
-        } else if(!googleImage) {
+        } else if (!googleImage) {
             new FirebaseStorageService().uploadFile(currentImageUri, StorageFolders.IMAGES, new OnSuccessListener() {
                 @Override
                 public void onSuccess(Object o) {

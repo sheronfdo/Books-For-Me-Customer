@@ -1,5 +1,7 @@
 package com.jamith.booksformecustomer.adapter;
 
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,15 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.BookDetailsActivity;
 import com.jamith.booksformecustomer.model.BookItem;
 
 import java.util.List;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
+public class BookItemAdapter extends RecyclerView.Adapter<BookItemAdapter.BookViewHolder> {
 
     private List<BookItem> books;
 
-    public BookAdapter(List<BookItem> books) {
+    public BookItemAdapter(List<BookItem> books) {
         this.books = books;
     }
 
@@ -35,6 +38,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         holder.title.setText(book.getTitle());
         holder.author.setText(book.getAuthor());
         holder.price.setText("$ " + book.getPrice());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), BookDetailsActivity.class);
+                intent.putExtra("selected_book", book);
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -18,7 +18,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="8dp" />
 
-    <!-- Profile Image -->
     <ImageButton
         android:id="@+id/profile_image"
         android:layout_width="150dp"
@@ -29,10 +28,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewProfileDetails" />
-
-    <!-- Display Name Label -->
-
-    <!-- Display Name Field -->
 
     <TextView
         android:id="@+id/display_name_label"
@@ -60,9 +55,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/display_name_label" />
 
-    <!-- First Name Label -->
-
-    <!-- First Name Field -->
     <TextView
         android:id="@+id/first_name_label"
         android:layout_width="wrap_content"
@@ -89,9 +81,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/first_name_label" />
 
-    <!-- Last Name Label -->
-
-    <!-- Last Name Field -->
     <TextView
         android:id="@+id/last_name_label"
         android:layout_width="wrap_content"
@@ -118,9 +107,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/last_name_label" />
 
-    <!-- Phone Number Label -->
 
-    <!-- Phone Number Field -->
     <TextView
         android:id="@+id/phone_number_label"
         android:layout_width="wrap_content"
