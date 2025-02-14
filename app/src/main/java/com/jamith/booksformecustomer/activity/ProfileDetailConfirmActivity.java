@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.hbb20.CountryCodePicker;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.dto.requestDTO.CustomerSignUpDTO;
 import com.jamith.booksformecustomer.dto.responseDTO.CustomerSignUpResponseDTO;
@@ -36,11 +37,13 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
     private EditText displayNameEditText, firstNameEditText, lastNameEditText, phoneNumberEditText;
     private ImageButton profileImageView;
     private Button confirmButton;
+    private CountryCodePicker countryCodePicker;
     private Uri currentImageUri;
     private String imageUri;
     private boolean googleImage = true;
     private final int PICK_IMAGE_REQUEST = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,8 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
         phoneNumberEditText = findViewById(R.id.phone_number_edit_text);
         profileImageView = findViewById(R.id.profile_image);
         confirmButton = findViewById(R.id.confirm_button);
+        countryCodePicker = findViewById(R.id.countryCodePicker);
+        countryCodePicker.registerCarrierNumberEditText(phoneNumberEditText);
 
         Intent intent = getIntent();
         String displayName = intent.getStringExtra("displayName");
@@ -74,7 +79,7 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
             currentImageUri = Uri.parse(photoUrl);
         }
         if (phoneNumber != null) {
-            phoneNumberEditText.setText(phoneNumber);
+            countryCodePicker.setFullNumber(phoneNumber);
         }
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +133,7 @@ public class ProfileDetailConfirmActivity extends AppCompatActivity {
         String displayName = displayNameEditText.getText().toString();
         String firstName = firstNameEditText.getText().toString();
         String lastName = lastNameEditText.getText().toString();
-        String phoneNumber = phoneNumberEditText.getText().toString();
+        String phoneNumber = countryCodePicker.getFullNumber().toString();
 
         CustomerSignUpDTO customerSignUpDTO = CustomerSignUpDTO.builder().uid(uid).email(email).displayName(displayName).firstName(firstName).lastName(lastName).phoneNumber(phoneNumber).build();
 

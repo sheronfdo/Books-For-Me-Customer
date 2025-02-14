@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
     Button buttonGoogle;
+    ProgressBar progressBar;
     FirebaseFirestore firebaseFirestore;
     GoogleSignInClient googleSignInClient;
     private int RC_SIGN_IN = 100;
@@ -47,13 +49,30 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        firebaseAuth = FirebaseAuth.getInstance();
-        if (firebaseAuth.getCurrentUser() != null) {
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
-        }
-        buttonGoogle = findViewById(R.id.googleSignInButton);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.bringToFront();
+        progressBar.setVisibility(View.VISIBLE);
         firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        buttonGoogle = findViewById(R.id.googleSignInButton);
+        buttonGoogle.setVisibility(View.GONE);
+        if (firebaseAuth.getCurrentUser() != null) {
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+            if (account != null) {
+                String token = account.getIdToken();
+                firebaseFirestore.collection("customers").document(firebaseAuth.getCurrentUser().getUid()).get().addOnSuccessListener(customer -> {
+                    if (customer.exists()) {
+                        progressBar.setVisibility(View.GONE);
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                    } else {
+                        firebaseAuthenticate(token);
+                    }
+                });
+            }
+        } else {
+            buttonGoogle.setVisibility(View.VISIBLE);
+        }
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
         buttonGoogle.setOnClickListener(new View.OnClickListener() {
@@ -93,9 +112,11 @@ public class MainActivity extends AppCompatActivity {
                     if (user != null) {
                         firebaseFirestore.collection("customers").document(user.getUid()).get().addOnSuccessListener(customer -> {
                             if (customer.exists()) {
+                                progressBar.setVisibility(View.GONE);
                                 Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                                 startActivity(intent);
                             } else {
+                                progressBar.setVisibility(View.GONE);
                                 String displayName = user.getDisplayName();
                                 String email = user.getEmail();
                                 Uri photoUrl = user.getPhotoUrl();
