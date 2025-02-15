@@ -1,66 +1,106 @@
 package com.jamith.booksformecustomer.activity.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.CheckoutActivity;
+import com.jamith.booksformecustomer.activity.HomeActivity;
+import com.jamith.booksformecustomer.adapter.CartAdapter;
+import com.jamith.booksformecustomer.model.CartItem;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CartFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class CartFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private RecyclerView cartRecyclerView;
+    private List<CartItem> cartItems;
+    private List<CartItem> selectedItems;
+    TextView cartSubTotal, cartShipping, cartTotal;
+    CartAdapter cartAdapter;
+    Button checkoutButton;
+    double total;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public CartFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CartFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CartFragment newInstance(String param1, String param2) {
-        CartFragment fragment = new CartFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
+        View view = inflater.inflate(R.layout.fragment_cart, container, false);
+        cartItems = new ArrayList<>();
+        selectedItems = new ArrayList<>();
+        cartRecyclerView = view.findViewById(R.id.cart_items_recycler_view);
+        cartRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        cartAdapter = new CartAdapter(cartItems, this::onItemChecked);
+        cartRecyclerView.setAdapter(cartAdapter);
+        cartSubTotal = view.findViewById(R.id.cartSubTotal);
+        cartShipping = view.findViewById(R.id.cartShipping);
+        cartTotal = view.findViewById(R.id.cartTotal);
+        fetchCartItems();
+        checkoutButton = view.findViewById(R.id.cartCheckoutButton);
+        checkoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireActivity(), CheckoutActivity.class);
+                intent.putExtra("selectedCartItems", (Serializable) selectedItems);
+                startActivity(intent);
+            }
+        });
+        return view;
+    }
+
+    private void onItemChecked(CartItem item, boolean isChecked) {
+        if (isChecked) {
+            selectedItems.add(item);
+        } else {
+            selectedItems.remove(item);
+        }
+        total = 0;
+        selectedItems.stream().forEach(e->{total = total+ (e.getQuantity() * e.getPrice());});
+        cartSubTotal.setText(Double.toString(total));
+        cartTotal.setText(Double.toString(total));
+    }
+
+    private void fetchCartItems() {
+        String userId = firebaseAuth.getUid();
+        db.collection("customers").document(userId).collection("cart")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            CartItem bookItem = document.toObject(CartItem.class);
+                            cartItems.add(bookItem);
+                        }
+                        setupCartAdapter();
+                    } else {
+                        // Handle error
+                    }
+                });
+    }
+
+    private void setupCartAdapter() {
+        cartAdapter.notifyDataSetChanged();
     }
 }

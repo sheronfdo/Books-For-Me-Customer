@@ -130,9 +130,6 @@ public class HomeViewModel extends ViewModel {
             if (bookItem.isFeatured()) {
                 featuredBooks.add(bookItem);
             }
-            Log.d("cate1", getRandomCategories().getValue()[0].getCategoryId());
-            Log.d("cate2", getRandomCategories().getValue()[1].getCategoryId());
-            Log.d("cate3", getRandomCategories().getValue()[2].getCategoryId());
             if (bookItem.getCategory().equals(getRandomCategories().getValue()[0].getCategoryId())) {
                 category1Books.add(bookItem);
             }
@@ -184,7 +181,6 @@ public class HomeViewModel extends ViewModel {
                             categories.add(category);
                         }
                         categoriesLiveData.setValue(categories);
-                        Log.d("cts", categories.toString());
                         getRandomCategories(categories, 3);
                     } else {
                         // Handle error
