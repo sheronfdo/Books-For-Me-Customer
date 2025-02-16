@@ -20,9 +20,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.adapter.CheckoutItemAdapter;
 import com.jamith.booksformecustomer.dto.requestDTO.OrderDTO;
+import com.jamith.booksformecustomer.dto.requestDTO.PaymentStatusDTO;
 import com.jamith.booksformecustomer.dto.responseDTO.OrderResponseDTO;
 import com.jamith.booksformecustomer.model.CartItem;
 import com.jamith.booksformecustomer.service.OrderService;
+import com.jamith.booksformecustomer.util.PaymentStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +104,31 @@ public class CheckoutActivity extends AppCompatActivity {
         Log.d("Order Object", orderDTO.toString());
         OrderService orderService = new OrderService();
         orderService.makeOrder(orderDTO, new OrderService.OrderServiceCallback() {
+            @Override
+            public void onSuccess(OrderResponseDTO response) {
+                Log.d("order success", response.toString());
+                orderResponseDTO = response;
+                paymentStatus();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("order failed", errorMessage.toString());
+            }
+
+            @Override
+            public void onFailure(String failureMessage) {
+                Log.e("order failed", failureMessage.toString());
+            }
+        });
+    }
+
+    private void paymentStatus(){
+        OrderService orderService = new OrderService();
+        PaymentStatusDTO paymentStatusDTO = new PaymentStatusDTO();
+        paymentStatusDTO.setOrderId(orderResponseDTO.getId());
+        paymentStatusDTO.setPaymentStatus(PaymentStatus.PAYMENT_STATUS_COMPLETED);
+        orderService.paymentStatus(paymentStatusDTO, new OrderService.OrderServiceCallback() {
             @Override
             public void onSuccess(OrderResponseDTO response) {
                 Log.d("order success", response.toString());
