@@ -1,66 +1,66 @@
 package com.jamith.booksformecustomer.activity.fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.adapter.OrderAdapter;
+import com.jamith.booksformecustomer.model.OrderItem;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link OrderFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class OrderFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public OrderFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OrderFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static OrderFragment newInstance(String param1, String param2) {
-        OrderFragment fragment = new OrderFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RecyclerView ordersRecyclerView;
+    private List<OrderItem> orders;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_order, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_order, container, false);
+        ordersRecyclerView = view.findViewById(R.id.orders_recycler_view);
+        ordersRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        orders = new ArrayList<>();
+        fetchOrders();
+        return view;
     }
+
+    private void fetchOrders() {
+        db.collection("customers").document(auth.getUid()).collection("orderItems").
+                get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            OrderItem order = document.toObject(OrderItem.class);
+                            order.setOrderItemId(document.getId());
+                            orders.add(order);
+                        }
+                        setupOrdersAdapter();
+                    } else {
+
+                    }
+                });
+    }
+
+    private void setupOrdersAdapter() {
+        OrderAdapter ordersAdapter = new OrderAdapter(orders);
+        ordersRecyclerView.setAdapter(ordersAdapter);
+    }
+
+
 }

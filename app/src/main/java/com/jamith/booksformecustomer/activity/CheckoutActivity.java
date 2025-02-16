@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.hbb20.CountryCodePicker;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.adapter.CheckoutItemAdapter;
 import com.jamith.booksformecustomer.dto.requestDTO.OrderDTO;
@@ -49,6 +50,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private TextView orderTotal;
     private EditText nameInput, addressInput, phoneInput, emailInput;
     private Button placeOrderButton;
+    private CountryCodePicker countryCodePicker;
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private double totalAmount = 0.0;
 
@@ -85,6 +87,10 @@ public class CheckoutActivity extends AppCompatActivity {
         checkoutItemAdapter = new CheckoutItemAdapter(cartItems);
         recyclerView.setAdapter(checkoutItemAdapter);
         checkoutItemAdapter.notifyDataSetChanged();
+
+        countryCodePicker = findViewById(R.id.checkoutCountryCodePicker);
+        countryCodePicker.registerCarrierNumberEditText(phoneInput);
+
         calculateTotalAmount();
         placeOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +111,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private void placeOrder() {
         String name = nameInput.getText().toString();
         String address = addressInput.getText().toString();
-        String phone = phoneInput.getText().toString();
+        String phone = countryCodePicker.getFullNumber().toString();
         String email = emailInput.getText().toString();
 
         if (name.isEmpty() || address.isEmpty() || phone.isEmpty() || email.isEmpty()) {

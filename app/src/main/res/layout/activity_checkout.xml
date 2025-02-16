@@ -40,11 +40,29 @@
             android:layout_height="wrap_content"
             android:hint="Address" />
 
-        <EditText
-            android:id="@+id/phone_input"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Phone Number" />
+            android:orientation="horizontal">
+
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/checkoutCountryCodePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:ccp_defaultLanguage="ENGLISH"
+                app:ccp_defaultNameCode="LK"
+                app:ccp_defaultPhoneCode="94"
+                app:ccp_showFlag="true"
+                app:ccp_showNameCode="false"
+                app:ccp_showPhoneCode="true" />
+
+            <EditText
+                android:id="@+id/phone_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Number" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/email_input"

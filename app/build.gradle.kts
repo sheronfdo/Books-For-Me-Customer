@@ -33,6 +33,12 @@ android {
     }
 }
 
+//tasks.whenTaskAdded {
+//    if (name == "assembleDebug" || name == "assembleRelease") {
+//        dependsOn("clean")
+//    }
+//}
+
 dependencies {
 
     implementation(libs.appcompat)
