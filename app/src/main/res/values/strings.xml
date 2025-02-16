@@ -1,4 +1,7 @@
 <resources>
+
+    <string name="paypal_client_id">AXyLScQOyuKSRIU3yctGCTPueJb2VyT-ATx9c1yzp4kxrunJ-hXNG5RNjggEuOGZE2COw2XfFJh7i7Z3</string>
+
     <string name="app_name">Books For Me Customer</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -149,7 +149,7 @@ public class BookDetailsActivity extends AppCompatActivity {
         cartItem.put("createdAt", DateUtil.fromFirestoreTimestamp());
 
         db.collection("customers").document(userId).collection("cart")
-                .document(book.getBookStockId())
+                .document()
                 .set(cartItem)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(BookDetailsActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();

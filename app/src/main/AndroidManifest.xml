@@ -21,6 +21,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".activity.OrderCompleteActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.CheckoutActivity"
             android:exported="false" />
         <activity
@@ -41,6 +44,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.paypal.sdk.clientId"
+            android:value="@string/paypal_client_id" />
     </application>
 
 </manifest>

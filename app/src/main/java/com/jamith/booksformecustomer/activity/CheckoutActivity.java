@@ -1,5 +1,7 @@
 package com.jamith.booksformecustomer.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,16 +22,27 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.adapter.CheckoutItemAdapter;
 import com.jamith.booksformecustomer.dto.requestDTO.OrderDTO;
+import com.jamith.booksformecustomer.dto.requestDTO.PaymentDetailsDTO;
 import com.jamith.booksformecustomer.dto.requestDTO.PaymentStatusDTO;
 import com.jamith.booksformecustomer.dto.responseDTO.OrderResponseDTO;
 import com.jamith.booksformecustomer.model.CartItem;
 import com.jamith.booksformecustomer.service.OrderService;
 import com.jamith.booksformecustomer.util.PaymentStatus;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutActivity extends AppCompatActivity {
+    private static final int PAYPAL_REQUEST_CODE = 150;
     RecyclerView recyclerView;
     CheckoutItemAdapter checkoutItemAdapter;
     List<CartItem> cartItems;
@@ -40,6 +53,9 @@ public class CheckoutActivity extends AppCompatActivity {
     private double totalAmount = 0.0;
 
     OrderResponseDTO orderResponseDTO;
+    PayPalConfiguration config;
+
+    String clientId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +67,12 @@ public class CheckoutActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        clientId = getString(R.string.paypal_client_id);
+        config = new PayPalConfiguration()
+                .environment(PayPalConfiguration.ENVIRONMENT_NO_NETWORK)
+                .clientId(clientId);
+
+        Log.d("pal client", clientId);
         orderTotal = findViewById(R.id.order_total);
         nameInput = findViewById(R.id.name_input);
         addressInput = findViewById(R.id.address_input);
@@ -108,7 +130,7 @@ public class CheckoutActivity extends AppCompatActivity {
             public void onSuccess(OrderResponseDTO response) {
                 Log.d("order success", response.toString());
                 orderResponseDTO = response;
-                paymentStatus();
+                handlePayment();
             }
 
             @Override
@@ -123,16 +145,82 @@ public class CheckoutActivity extends AppCompatActivity {
         });
     }
 
-    private void paymentStatus(){
+    private void handlePayment() {
+        PayPalPayment payment = new PayPalPayment(
+                new BigDecimal(totalAmount),
+                "USD",
+                "Order Payment",
+                PayPalPayment.PAYMENT_INTENT_SALE
+        );
+
+        Intent intent = new Intent(CheckoutActivity.this, PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+        startActivityForResult(intent, PAYPAL_REQUEST_CODE);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PAYPAL_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                PaymentConfirmation confirm = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                if (confirm != null) {
+                    try {
+                        String paymentDetailsFromPaypal = confirm.toJSONObject().toString(4);
+                        Log.d("payment details", paymentDetailsFromPaypal);
+                        JSONObject paymentDetails = new JSONObject(paymentDetailsFromPaypal);
+
+                        // Extracting Response
+                        JSONObject response = paymentDetails.getJSONObject("response");
+
+                        // Get Payment Details
+                        String paymentId = response.getString("id");
+                        String paymentState = response.getString("state");
+                        String paymentCreateTime = response.getString("create_time");
+                        String paymentIntent = response.getString("intent");
+
+                        PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
+                        paymentDetailsDTO.setPaymentId(paymentId);
+                        paymentDetailsDTO.setPaymentStatus(paymentState);
+                        paymentDetailsDTO.setCreatedTime(paymentCreateTime);
+                        paymentDetailsDTO.setIntent(paymentIntent);
+
+                        paymentStatus(paymentDetailsDTO);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(CheckoutActivity.this, "Payment Canceled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    private void paymentStatus(PaymentDetailsDTO paymentDetailsDTO) {
         OrderService orderService = new OrderService();
         PaymentStatusDTO paymentStatusDTO = new PaymentStatusDTO();
         paymentStatusDTO.setOrderId(orderResponseDTO.getId());
         paymentStatusDTO.setPaymentStatus(PaymentStatus.PAYMENT_STATUS_COMPLETED);
+        paymentStatusDTO.setPaymentDetailsDTO(paymentDetailsDTO);
+
         orderService.paymentStatus(paymentStatusDTO, new OrderService.OrderServiceCallback() {
             @Override
             public void onSuccess(OrderResponseDTO response) {
                 Log.d("order success", response.toString());
                 orderResponseDTO = response;
+                String transactionId = paymentDetailsDTO.getPaymentId();
+                String orderId = orderResponseDTO.getId();
+
+                // Navigate to OrderCompletionActivity
+                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                intent.putExtra("order_id", orderId);
+                intent.putExtra("transaction_id", transactionId);
+                startActivity(intent);
+                finish();
             }
 
             @Override

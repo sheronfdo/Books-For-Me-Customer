@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             buttonGoogle.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
         }
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
