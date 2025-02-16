@@ -13,6 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class CartItem implements Serializable {
+    private String cartItemId;
     private String bookId;
     private String bookStockId;
     private String sellerId;

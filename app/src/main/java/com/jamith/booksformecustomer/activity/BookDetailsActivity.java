@@ -22,14 +22,21 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.model.BookItem;
+import com.jamith.booksformecustomer.model.CartItem;
+import com.jamith.booksformecustomer.util.DateUtil;
 
-import java.text.SimpleDateFormat;
+import org.modelmapper.ModelMapper;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BookDetailsActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    ModelMapper modelMapper = new ModelMapper();
 
 
     @Override
@@ -117,7 +124,14 @@ public class BookDetailsActivity extends AppCompatActivity {
         });
 
         buyNowButton.setOnClickListener(v -> {
-
+            CartItem cartItem = modelMapper.map(bookItem, CartItem.class);
+            cartItem.setImageUrl(bookItem.getImageUrl());
+            cartItem.setQuantity(1);
+            List<CartItem> selectedItems = new ArrayList<>();
+            selectedItems.add(cartItem);
+            Intent intent = new Intent(BookDetailsActivity.this, CheckoutActivity.class);
+            intent.putExtra("selectedCartItems", (Serializable) selectedItems);
+            startActivity(intent);
         });
     }
 
@@ -132,7 +146,7 @@ public class BookDetailsActivity extends AppCompatActivity {
         cartItem.put("imageUrl", book.getImageUrl());
         cartItem.put("sellerId", book.getSellerId());
         cartItem.put("bookStockId", book.getBookStockId());
-        cartItem.put("createdAt", FieldValue.serverTimestamp());
+        cartItem.put("createdAt", DateUtil.fromFirestoreTimestamp());
 
         db.collection("customers").document(userId).collection("cart")
                 .document(book.getBookStockId())

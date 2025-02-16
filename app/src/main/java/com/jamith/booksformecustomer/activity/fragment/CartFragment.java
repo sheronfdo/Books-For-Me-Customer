@@ -91,6 +91,7 @@ public class CartFragment extends Fragment {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             CartItem bookItem = document.toObject(CartItem.class);
+                            bookItem.setCartItemId(document.getId());
                             cartItems.add(bookItem);
                         }
                         setupCartAdapter();
