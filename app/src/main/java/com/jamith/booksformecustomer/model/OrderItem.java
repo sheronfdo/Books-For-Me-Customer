@@ -20,4 +20,5 @@ public class OrderItem {
     private int quantity;
     private String sellerId;
     private String title;
+    private String status;
 }

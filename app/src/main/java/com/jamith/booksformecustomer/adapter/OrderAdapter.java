@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.model.OrderItem;
+import com.jamith.booksformecustomer.util.OrderStatus;
 
 import java.util.List;
 
@@ -41,8 +42,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderItemVie
         holder.title.setText(orderItem.getTitle());
         holder.price.setText(Double.toString(orderItem.getPrice()));
         holder.quantity.setText(Integer.toString(orderItem.getQuantity()));
-
-//        holder.status.setText();
+        holder.status.setText(OrderStatus.valueOf(orderItem.getStatus()).toString());
 
     }
 

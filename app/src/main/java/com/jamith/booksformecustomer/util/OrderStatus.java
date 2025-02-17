@@ -1,5 +1,23 @@
 package com.jamith.booksformecustomer.util;
 
 public enum OrderStatus {
-    ORDER_CONFIRMED, ORDER_COMPLETED, ORDER_FAILED, ORDER_CANCELLED, ORDER_REJECTED, ORDER_APPROVED, PAYMENT_STATUS_APPROVED, PAYMENT_STATUS_REJECTED, PAYMENT_PENDING;
+    // Order Placement
+    ORDER_CONFIRMED,
+    ORDER_APPROVED,
+
+    // Order Processing and Fulfillment
+    PROCESSING,
+    SHIPPED,
+    DELIVERED,
+    ORDER_COMPLETED,
+
+    // Order Cancellations and Failures
+    ORDER_CANCELLED,
+    ORDER_REJECTED,
+    ORDER_FAILED,
+
+    // Payment Statuses
+    PAYMENT_PENDING,
+    PAYMENT_STATUS_APPROVED,
+    PAYMENT_STATUS_REJECTED
 }
