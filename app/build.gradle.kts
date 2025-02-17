@@ -66,5 +66,5 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.hbb20:ccp:2.5.1")
     implementation("com.paypal.sdk:paypal-android-sdk:2.16.0")
-
+    implementation("com.google.firebase:firebase-messaging")
 }
