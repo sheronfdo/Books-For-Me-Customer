@@ -1,16 +1,23 @@
 package com.jamith.booksformecustomer.activity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.activity.fragment.CartFragment;
 import com.jamith.booksformecustomer.activity.fragment.HomeFragment;
@@ -19,6 +26,8 @@ import com.jamith.booksformecustomer.activity.fragment.ProfileFragment;
 
 public class HomeActivity extends AppCompatActivity {
     private FrameLayout fragmentContainer;
+    private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -47,17 +56,34 @@ public class HomeActivity extends AppCompatActivity {
                 loadFragment(new CartFragment());
             } else if (itemId == R.id.nav_orders) {
                 loadFragment(new OrderFragment());
-            } else if (itemId == R.id.nav_profile){
+            } else if (itemId == R.id.nav_profile) {
                 loadFragment(new ProfileFragment());
             }
             return true;
         });
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (!task.isSuccessful()) {
+                    Log.d("Fetching FCM registration token failed", task.getException().toString());
+                    return;
+                }
+                String token = task.getResult();
+                Log.d("Token", token);
+                tokenUpdate(token);
+            }
+        });
+    }
+
+    private void tokenUpdate(String token) {
+        firebaseFirestore.collection("customers").document(firebaseAuth.getCurrentUser().getUid()).update("fcmToken", token).addOnSuccessListener(aVoid -> {
+            Log.d("Firestore", "FCM token updated successfully.");
+        }).addOnFailureListener(e -> {
+            Log.e("Firestore", "Error updating FCM token", e);
+        });
     }
 
     private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
-                .commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment).commit();
     }
 }
