@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.jamith.booksformecustomer.dto.requestDTO.CustomerSignUpDTO;
+import com.jamith.booksformecustomer.dto.requestDTO.CustomerUpdateDTO;
 import com.jamith.booksformecustomer.dto.responseDTO.CustomerSignUpResponseDTO;
 import com.jamith.booksformecustomer.dto.responseDTO.ErrorResponse;
 import com.jamith.booksformecustomer.dto.responseDTO.SuccessResponse;
@@ -32,6 +33,49 @@ public class SignUpService {
         RequestBody body = RequestBody.create(jsonData, JSONMediaType);
         Request request = new Request.Builder()
                 .url(UrlConstants.CUSTOMER_REGISTER_URL)
+                .post(body)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e("Network Error", "Failed to connect to the server: " + e.getMessage());
+                callback.onFailure("No internet connection or server unreachable.");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        String responseBody = response.body().string();
+                        Log.d("Response Success", responseBody);
+                        SuccessResponse successResponse = gson.fromJson(responseBody, SuccessResponse.class);
+                        CustomerSignUpResponseDTO customerSignUpResponseDTO = modelMapper.map(successResponse.getData(), CustomerSignUpResponseDTO.class);
+                        Log.d("Sign Up Details", customerSignUpResponseDTO.toString());
+                        callback.onSuccess(customerSignUpResponseDTO);
+                    } catch (Exception e) {
+                        Log.e("Parsing Error", "Failed to parse the response: " + e.getMessage());
+                        callback.onError("Failed to process the server response.");
+                    }
+                } else {
+                    try {
+                        String errorBody = response.body().string();
+                        Log.e("Response Error", errorBody);
+                        ErrorResponse errorResponse = gson.fromJson(errorBody, ErrorResponse.class);
+                        callback.onError(errorResponse.getMessage());
+                    } catch (Exception e) {
+                        Log.e("Error Parsing", "Failed to parse the error response: " + e.getMessage());
+                        callback.onError("An unexpected error occurred.");
+                    }
+                }
+            }
+        });
+    }
+
+    public void customerUpdate(CustomerUpdateDTO customerUpdateDTO, SignUpServiceCallback callback) {
+        String jsonData = gson.toJson(customerUpdateDTO);
+        RequestBody body = RequestBody.create(jsonData, JSONMediaType);
+        Request request = new Request.Builder()
+                .url(UrlConstants.CUSTOMER_UPDATE_PROFILE_URL)
                 .post(body)
                 .build();
         client.newCall(request).enqueue(new Callback() {
