@@ -62,11 +62,13 @@ public class MessageService extends FirebaseMessagingService {
         });
     }
 
-    private void tokenUpdate(String token) {
-        firebaseFirestore.collection("customers").document(firebaseAuth.getCurrentUser().getUid()).update("fcmToken", token).addOnSuccessListener(aVoid -> {
-            Log.d("Firestore", "FCM token updated successfully.");
-        }).addOnFailureListener(e -> {
-            Log.e("Firestore", "Error updating FCM token", e);
-        });
+    public void tokenUpdate(String token) {
+        if (firebaseAuth.getCurrentUser() != null) {
+            firebaseFirestore.collection("customers").document(firebaseAuth.getCurrentUser().getUid()).update("fcmToken", token).addOnSuccessListener(aVoid -> {
+                Log.d("Firestore", "FCM token updated successfully.");
+            }).addOnFailureListener(e -> {
+                Log.e("Firestore", "Error updating FCM token", e);
+            });
+        }
     }
 }

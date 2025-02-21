@@ -3,6 +3,7 @@ package com.jamith.booksformecustomer.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -28,7 +29,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.service.MessageService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,6 +85,24 @@ public class MainActivity extends AppCompatActivity {
                 googleSignIn();
             }
         });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("FCM_TOKEN", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.d("FCM_TOKEN", "FCM Token: " + token);
+                        MessageService messageService = new MessageService();
+                        if (firebaseAuth.getCurrentUser() != null){
+                            messageService.tokenUpdate(token);
+                        }
+                    }
+                });
+
     }
 
     private void googleSignIn() {
@@ -142,4 +163,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
