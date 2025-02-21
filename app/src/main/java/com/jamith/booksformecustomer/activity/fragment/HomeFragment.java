@@ -1,9 +1,11 @@
 package com.jamith.booksformecustomer.activity.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -12,7 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.HomeActivity;
+import com.jamith.booksformecustomer.activity.SearchResultsActivity;
 import com.jamith.booksformecustomer.adapter.BookItemAdapter;
 import com.jamith.booksformecustomer.adapter.CarouselAdapter;
 import com.jamith.booksformecustomer.adapter.CategoryAdapter;
@@ -25,6 +30,9 @@ public class HomeFragment extends Fragment {
             category1RecyclerView, category2RecyclerView, category3RecyclerView;
     ViewPager2 carouselView;
     TextView categoryOneTextView, categoryTwoTextView, categoryThreeTextView;
+    Button searchButton;
+    HomeActivity homeActivity;
+    TextInputEditText searchTextInput;
 
 
     @Override
@@ -38,7 +46,8 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
+        homeActivity = (HomeActivity) getActivity();
+        searchTextInput = view.findViewById(R.id.search_edit_text);
 
         carouselView = view.findViewById(R.id.carousel_view);
         homeViewModel.getCarouselImages().observe(getViewLifecycleOwner(), images -> {
@@ -103,6 +112,16 @@ public class HomeFragment extends Fragment {
             categoryOneTextView.setText(randomcategories[0].getName());
             categoryTwoTextView.setText(randomcategories[1].getName());
             categoryThreeTextView.setText(randomcategories[2].getName());
+        });
+
+        searchButton = view.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(homeActivity, SearchResultsActivity.class);
+                intent.putExtra("query", searchTextInput.getText().toString());
+                startActivity(intent);
+            }
         });
 
         return view;

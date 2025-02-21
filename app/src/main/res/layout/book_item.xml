@@ -3,7 +3,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="150dp"
-    android:layout_height="wrap_content"
+    android:layout_height="250dp"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
@@ -14,15 +14,15 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Book Cover Image -->
+
+        <!-- Book Title -->
         <ImageView
             android:id="@+id/cover_image"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="140dp"
             android:contentDescription="Book Cover"
             android:scaleType="centerCrop" />
 
-        <!-- Book Title -->
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"

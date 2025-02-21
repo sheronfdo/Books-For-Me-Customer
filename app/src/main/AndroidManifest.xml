@@ -22,6 +22,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".activity.SearchResultsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.OrderCompleteActivity"
             android:exported="false" />
         <activity
@@ -53,6 +56,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <meta-data
             android:name="com.paypal.sdk.clientId"
             android:value="@string/paypal_client_id" />
