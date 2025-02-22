@@ -2,6 +2,7 @@ package com.jamith.booksformecustomer.activity.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +20,8 @@ import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.activity.HomeActivity;
 import com.jamith.booksformecustomer.activity.SearchResultsActivity;
 import com.jamith.booksformecustomer.adapter.BookItemAdapter;
-import com.jamith.booksformecustomer.adapter.CarouselAdapter;
 import com.jamith.booksformecustomer.adapter.CategoryAdapter;
+import com.jamith.booksformecustomer.adapter.TrendingBooksAdapter;
 import com.jamith.booksformecustomer.viewModel.HomeViewModel;
 
 
@@ -50,9 +51,15 @@ public class HomeFragment extends Fragment {
         searchTextInput = view.findViewById(R.id.search_edit_text);
 
         carouselView = view.findViewById(R.id.carousel_view);
-        homeViewModel.getCarouselImages().observe(getViewLifecycleOwner(), images -> {
-            CarouselAdapter carouselAdapter = new CarouselAdapter(images);
-            carouselView.setAdapter(carouselAdapter);
+//        homeViewModel.getCarouselImages().observe(getViewLifecycleOwner(), images -> {
+//            CarouselAdapter carouselAdapter = new CarouselAdapter(images);
+//            carouselView.setAdapter(carouselAdapter);
+//        });
+
+        homeViewModel.getBooksLiveData().observe(getViewLifecycleOwner(), books -> {
+            Log.d("BooksFetched", "fetched");
+            TrendingBooksAdapter trendingBooksAdapter = new TrendingBooksAdapter(books);
+            carouselView.setAdapter(trendingBooksAdapter);
         });
 
 

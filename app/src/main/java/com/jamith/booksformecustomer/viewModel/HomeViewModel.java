@@ -7,8 +7,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jamith.booksformecustomer.model.Book;
 import com.jamith.booksformecustomer.model.BookItem;
 import com.jamith.booksformecustomer.model.BookStock;
@@ -18,6 +23,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +37,7 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<List<BookItem>> category2BooksLiveData = new MutableLiveData<>();
     private MutableLiveData<List<BookItem>> category3BooksLiveData = new MutableLiveData<>();
     private MutableLiveData<Category[]> randomCategories = new MutableLiveData<>();
+    private MutableLiveData<List<Book>> booksLiveData = new MutableLiveData<>();
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ModelMapper modelMapper = new ModelMapper();
@@ -39,7 +46,7 @@ public class HomeViewModel extends ViewModel {
     HomeViewModel() {
         fetchCategories();
         fetchCarouselImages();
-
+        fetchTrendingBooks();
     }
 
 
@@ -71,9 +78,89 @@ public class HomeViewModel extends ViewModel {
         return carouselImages;
     }
 
+    public MutableLiveData<List<Book>> getBooksLiveData() {
+        return booksLiveData;
+    }
+
     public MutableLiveData<Category[]> getRandomCategories() {
         return randomCategories;
     }
+
+    public void fetchTrendingBooks() {
+        long sevenDaysAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000); // 7 days in milliseconds
+        Timestamp lastWeek = new Timestamp(new Date(sevenDaysAgo));
+
+        Log.d("sevenDaysAgo", String.valueOf(sevenDaysAgo));
+        Log.d("lastWeek", lastWeek.toString());
+        db.collection("orders")
+                .whereGreaterThanOrEqualTo("createdAt", lastWeek) // Fetch recent orders
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    Map<String, Integer> trendingBooksMap = new HashMap<>();
+                    List<Task<QuerySnapshot>> orderItemTasks = new ArrayList<>();
+
+                    // Fetch orderItem subcollections from recent orders
+                    for (DocumentSnapshot orderDoc : querySnapshot.getDocuments()) {
+                        Task<QuerySnapshot> orderItemTask = orderDoc.getReference().collection("orderItems").get();
+                        orderItemTasks.add(orderItemTask);
+                        Log.d("orderItemTask", orderItemTask.toString());
+                    }
+
+                    Log.d("orderItemTasks", orderItemTasks.toString());
+                    // Process order items after fetching
+                    Tasks.whenAllSuccess(orderItemTasks).addOnSuccessListener(results -> {
+                        for (Object result : results) {
+                            QuerySnapshot querySnapshot1 = (QuerySnapshot) result;
+                            for (DocumentSnapshot document : querySnapshot1.getDocuments()) {
+                                String bookId = document.getString("bookId");
+                                int quantity = document.getLong("quantity").intValue();
+
+                                trendingBooksMap.put(bookId, trendingBooksMap.getOrDefault(bookId, 0) + quantity);
+                            }
+                        }
+                        Log.d("trendingBooksMap", trendingBooksMap.toString());
+                        // Sort trending books
+                        List<Map.Entry<String, Integer>> sortedBooks = new ArrayList<>(trendingBooksMap.entrySet());
+                        sortedBooks.sort((a, b) -> b.getValue().compareTo(a.getValue())); // Descending order
+
+                        List<String> trendingBookIds = new ArrayList<>();
+                        for (int i = 0; i < Math.min(3, sortedBooks.size()); i++) {
+                            trendingBookIds.add(sortedBooks.get(i).getKey());
+                        }
+
+                        Log.d("trendingBookIds", trendingBookIds.toString());
+                        fetchBookDetails(trendingBookIds);
+                    });
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching trending orders", e));
+    }
+
+    private void fetchBookDetails(List<String> bookIds) {
+        List<Book> books = new ArrayList<>();
+        if (bookIds.isEmpty()) {
+            booksLiveData.setValue(books);
+            return;
+        }
+        for (String bookId : bookIds) {
+            db.collection("books").document(bookId)
+                    .get()
+                    .addOnSuccessListener(document -> {
+                        Book book = document.toObject(Book.class);
+                        if (book != null) {
+                            books.add(book);
+                        }
+
+                        // Check if all books are processed
+                        if (books.size() == bookIds.size()) {
+                            booksLiveData.setValue(books);
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("Firestore", "Error fetching book details", e));
+        }
+        Log.d("books", books.toString());
+    }
+
+
 
     private void fetchCarouselImages() {
         List<String> images = new ArrayList<>();
