@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 public class HomeViewModel extends ViewModel {
-    private final MutableLiveData<List<String>> carouselImages = new MutableLiveData<>();
     private MutableLiveData<List<BookItem>> featuredBooksLiveData = new MutableLiveData<>();
     private MutableLiveData<List<BookItem>> newArrivalsLiveData = new MutableLiveData<>();
     private MutableLiveData<List<Category>> categoriesLiveData = new MutableLiveData<>();
@@ -45,7 +44,6 @@ public class HomeViewModel extends ViewModel {
 
     HomeViewModel() {
         fetchCategories();
-        fetchCarouselImages();
         fetchTrendingBooks();
     }
 
@@ -74,10 +72,6 @@ public class HomeViewModel extends ViewModel {
         return category3BooksLiveData;
     }
 
-    public MutableLiveData<List<String>> getCarouselImages() {
-        return carouselImages;
-    }
-
     public MutableLiveData<List<Book>> getBooksLiveData() {
         return booksLiveData;
     }
@@ -92,10 +86,8 @@ public class HomeViewModel extends ViewModel {
 
         Log.d("sevenDaysAgo", String.valueOf(sevenDaysAgo));
         Log.d("lastWeek", lastWeek.toString());
-        db.collection("orders")
-                .whereGreaterThanOrEqualTo("createdAt", lastWeek) // Fetch recent orders
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
+        db.collection("orders").whereGreaterThanOrEqualTo("createdAt", lastWeek) // Fetch recent orders
+                .get().addOnSuccessListener(querySnapshot -> {
                     Map<String, Integer> trendingBooksMap = new HashMap<>();
                     List<Task<QuerySnapshot>> orderItemTasks = new ArrayList<>();
 
@@ -131,8 +123,7 @@ public class HomeViewModel extends ViewModel {
                         Log.d("trendingBookIds", trendingBookIds.toString());
                         fetchBookDetails(trendingBookIds);
                     });
-                })
-                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching trending orders", e));
+                }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching trending orders", e));
     }
 
     private void fetchBookDetails(List<String> bookIds) {
@@ -142,77 +133,95 @@ public class HomeViewModel extends ViewModel {
             return;
         }
         for (String bookId : bookIds) {
-            db.collection("books").document(bookId)
-                    .get()
-                    .addOnSuccessListener(document -> {
-                        Book book = document.toObject(Book.class);
-                        if (book != null) {
-                            books.add(book);
-                        }
+            db.collection("books").document(bookId).get().addOnSuccessListener(document -> {
+                Book book = document.toObject(Book.class);
+                if (book != null) {
+                    books.add(book);
+                }
 
-                        // Check if all books are processed
-                        if (books.size() == bookIds.size()) {
-                            booksLiveData.setValue(books);
-                        }
-                    })
-                    .addOnFailureListener(e -> Log.e("Firestore", "Error fetching book details", e));
+                // Check if all books are processed
+                if (books.size() == bookIds.size()) {
+                    booksLiveData.setValue(books);
+                }
+            }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching book details", e));
         }
         Log.d("books", books.toString());
     }
 
+    public void fetchCategories() {
+        db.collection("categories").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Category> categories = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Category category = document.toObject(Category.class);
+                    category.setCategoryId(document.getId());
+                    categories.add(category);
+                }
+                categoriesLiveData.setValue(categories);
+                getRandomCategories(categories, 3);
+            } else {
+                // Handle error
+            }
+        });
+    }
 
-
-    private void fetchCarouselImages() {
-        List<String> images = new ArrayList<>();
-        images.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
-        images.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
-        images.add("https://th.bing.com/th/id/OIP.AjNwNT6sC_I6iDo03b9XrgHaGv?rs=1&pid=ImgDetMain");
-        carouselImages.setValue(images);
+    private void getRandomCategories(List<Category> categories, int count) {
+        if (categories == null || categories.isEmpty() || count <= 0) {
+            return;
+        }
+        List<Category> shuffledCategories = new ArrayList<>(categories);
+        Collections.shuffle(shuffledCategories); // Shuffle the copied list
+        List<Category> selectedCategories = shuffledCategories.subList(0, Math.min(count, shuffledCategories.size()));
+        Category[] randomCategoriesArray = selectedCategories.toArray(new Category[0]);
+        randomCategories.setValue(randomCategoriesArray);
+        fetchAndProcessBookStocks();
     }
 
     public void fetchAndProcessBookStocks() {
-        db.collection("bookStocks").limit(100)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Map<String, BookItem> latestBookStocks = new HashMap<>();
+        db.collection("bookStocks").limit(100).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Map<String, BookItem> latestBookStocks = new HashMap<>();
+                Log.d("bookcount", String.valueOf(task.getResult().size()));
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    BookStock bookStock = document.toObject(BookStock.class);
+                    bookStock.setBookStockId(document.getId());
 
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            BookStock bookStock = document.toObject(BookStock.class);
-                            bookStock.setBookStockId(document.getId());
-
-                            String bookId = bookStock.getBookId();
-                            if (latestBookStocks.containsKey(bookId)) {
-                                BookItem existingStock = latestBookStocks.get(bookId);
-                                if (bookStock.getCreatedAt().after(existingStock.getCreatedAt())) {
-                                    getBookItem(bookStock, bookItem -> {
-                                        latestBookStocks.put(bookId, bookItem);
-                                        checkAndUpdateLists(latestBookStocks);
-
-                                    });
-                                }
-                            } else {
-                                getBookItem(bookStock, bookItem -> {
-                                    latestBookStocks.put(bookId, bookItem);
-                                    checkAndUpdateLists(latestBookStocks);
-                                });
-                            }
+                    String bookId = bookStock.getBookId();
+                    if (latestBookStocks.containsKey(bookId)) {
+                        BookItem existingStock = latestBookStocks.get(bookId);
+                        if (bookStock.getCreatedAt().after(existingStock.getCreatedAt())) {
+                            getBookItem(bookStock, bookItem -> {
+                                latestBookStocks.put(bookId, bookItem);
+                                checkAndUpdateLists(latestBookStocks);
+                            });
                         }
-//                        checkAndUpdateLists(latestBookStocks, featuredBooks, newArrivals, category1Books, category2Books, category3Books);
-
                     } else {
-                        // Handle error
+                        getBookItem(bookStock, bookItem -> {
+                            latestBookStocks.put(bookId, bookItem);
+                            checkAndUpdateLists(latestBookStocks);
+                        });
                     }
-                });
+                    if(latestBookStocks.size() == task.getResult().size()){
+                        checkAndUpdateLists(latestBookStocks);
+                    }
+                }
+            } else {
+                // Handle error
+            }
+        });
     }
 
     private void checkAndUpdateLists(Map<String, BookItem> latestBookStocks) {
-
         List<BookItem> featuredBooks = new ArrayList<>();
         List<BookItem> newArrivals = new ArrayList<>();
         List<BookItem> category1Books = new ArrayList<>();
         List<BookItem> category2Books = new ArrayList<>();
         List<BookItem> category3Books = new ArrayList<>();
+        featuredBooksLiveData.setValue(featuredBooks);
+        newArrivalsLiveData.setValue(newArrivals);
+        category1BooksLiveData.setValue(category1Books);
+        category2BooksLiveData.setValue(category2Books);
+        category3BooksLiveData.setValue(category3Books);
         for (BookItem bookItem : latestBookStocks.values()) {
             if (bookItem.isFeatured()) {
                 featuredBooks.add(bookItem);
@@ -256,32 +265,6 @@ public class HomeViewModel extends ViewModel {
         });
     }
 
-    public void fetchCategories() {
-        db.collection("categories")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Category> categories = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Category category = document.toObject(Category.class);
-                            category.setCategoryId(document.getId());
-                            categories.add(category);
-                        }
-                        categoriesLiveData.setValue(categories);
-                        getRandomCategories(categories, 3);
-                    } else {
-                        // Handle error
-                    }
-                });
-    }
-
-    private void getRandomCategories(List<Category> categories, int count) {
-        List<Category> shuffledCategories = new ArrayList<>(categories);
-        Collections.shuffle(shuffledCategories);
-        Category[] randomCategoriesArray = categories.subList(0, count).toArray(new Category[0]);
-        randomCategories.setValue(randomCategoriesArray);
-        fetchAndProcessBookStocks();
-    }
 
     public interface OnBookFetchedListener {
         void onBookFetched(BookItem bookItem);

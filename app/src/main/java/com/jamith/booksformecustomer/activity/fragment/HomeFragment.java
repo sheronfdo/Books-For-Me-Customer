@@ -51,11 +51,6 @@ public class HomeFragment extends Fragment {
         searchTextInput = view.findViewById(R.id.search_edit_text);
 
         carouselView = view.findViewById(R.id.carousel_view);
-//        homeViewModel.getCarouselImages().observe(getViewLifecycleOwner(), images -> {
-//            CarouselAdapter carouselAdapter = new CarouselAdapter(images);
-//            carouselView.setAdapter(carouselAdapter);
-//        });
-
         homeViewModel.getBooksLiveData().observe(getViewLifecycleOwner(), books -> {
             Log.d("BooksFetched", "fetched");
             TrendingBooksAdapter trendingBooksAdapter = new TrendingBooksAdapter(books);
