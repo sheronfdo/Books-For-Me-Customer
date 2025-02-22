@@ -17,18 +17,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.fragment.FilterBottomSheetDialogFragment;
 import com.jamith.booksformecustomer.adapter.SearchResultAdapter;
 import com.jamith.booksformecustomer.adapter.SearchSuggestionAdapter;
 import com.jamith.booksformecustomer.model.Book;
+import com.jamith.booksformecustomer.viewModel.CategoriesViewModel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SearchResultsActivity extends AppCompatActivity {
     private EditText searchEditText;
@@ -39,6 +44,10 @@ public class SearchResultsActivity extends AppCompatActivity {
     private SearchSuggestionAdapter suggestionAdapter;
     private SearchResultAdapter resultAdapter;
     private Intent intent;
+    private CategoriesViewModel categoriesViewModel;
+    private Set<String> selectedCategoryIds = new HashSet<>();
+    private List<Book> allBooks = new ArrayList<>();
+    private FilterBottomSheetDialogFragment bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +59,9 @@ public class SearchResultsActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        categoriesViewModel = new ViewModelProvider(this).get(CategoriesViewModel.class);
+        categoriesViewModel.fetchCategories();
         intent = getIntent();
-
 
         searchEditText = findViewById(R.id.search_results_edit_text);
         suggestionsRecycler = findViewById(R.id.suggestions_recycler);
@@ -60,7 +69,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.search_results_progress_bar);
         emptyStateText = findViewById(R.id.empty_state_text);
         filterButton = findViewById(R.id.filter_button);
-
+        filterButton.setOnClickListener(v -> showFilterBottomSheet());
 
         suggestionsRecycler.setLayoutManager(new LinearLayoutManager(this));
         resultsRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -79,7 +88,6 @@ public class SearchResultsActivity extends AppCompatActivity {
         suggestionsRecycler.setElevation(10f);
         resultsRecycler.setAdapter(resultAdapter);
 
-        searchEditText.setText(intent.getStringExtra("query"));
 
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -90,6 +98,8 @@ public class SearchResultsActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 2) {
                     fetchSuggestions(s.toString());
+                } else if (s.length() == 0) {
+                    performSearch();
                 } else {
                     suggestionsRecycler.setVisibility(View.GONE);
                 }
@@ -109,6 +119,51 @@ public class SearchResultsActivity extends AppCompatActivity {
             return false;
         });
 
+        if (intent.getBooleanExtra("isCategory", false)) {
+            performSearch();
+            String categoryId = intent.getStringExtra("categoryId");
+            selectedCategoryIds.add(categoryId);
+        } else {
+            searchEditText.setText(intent.getStringExtra("query"));
+            performSearch();
+        }
+
+    }
+
+    private void showFilterBottomSheet() {
+        bottomSheet = new FilterBottomSheetDialogFragment();
+        categoriesViewModel.getCategoriesLiveData().observe(this, categories -> {
+            bottomSheet.setCategories(categories);
+            bottomSheet.setFilterListener(new FilterBottomSheetDialogFragment.FilterListener() {
+                @Override
+                public void onFilterApplied(Set<String> selectedCategories) {
+                    Log.d("filtered", "");
+                    selectedCategoryIds = selectedCategories;
+                    applyFilters();
+                }
+            });
+        });
+        bottomSheet.setSelectedCategories(selectedCategoryIds);
+        bottomSheet.show(getSupportFragmentManager(), "FilterBottomSheet");
+    }
+
+    private void applyFilters() {
+        if (selectedCategoryIds.isEmpty()) {
+            resultAdapter.updateResults(allBooks);
+        } else {
+            List<Book> filteredBooks = new ArrayList<>();
+            for (Book book : allBooks) {
+                if (selectedCategoryIds.contains(book.getCategory())) {
+                    filteredBooks.add(book);
+                }
+            }
+            resultAdapter.updateResults(filteredBooks);
+        }
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        emptyStateText.setVisibility(resultAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     private void fetchSuggestions(String query) {
@@ -119,6 +174,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 .limit(5)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    progressBar.setVisibility(View.GONE);
                     List<String> suggestions = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         suggestions.add(doc.getString("title"));
@@ -132,10 +188,8 @@ public class SearchResultsActivity extends AppCompatActivity {
                 });
     }
 
-    // Perform full search
     private void performSearch() {
         String query = searchEditText.getText().toString().trim();
-        if (query.isEmpty()) return;
 
         progressBar.setVisibility(View.VISIBLE);
         emptyStateText.setVisibility(View.GONE);
@@ -145,20 +199,22 @@ public class SearchResultsActivity extends AppCompatActivity {
                 .orderBy("title")
                 .startAt(query)
                 .endAt(query + "\uf8ff")
+                .limit(100)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     progressBar.setVisibility(View.GONE);
                     suggestionsRecycler.setVisibility(View.GONE);
-                    List<Book> results = new ArrayList<>();
+                    allBooks = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        results.add(doc.toObject(Book.class));
+                        allBooks.add(doc.toObject(Book.class));
                     }
-                    if (!results.isEmpty()) {
+                    if (!allBooks.isEmpty()) {
                         resultsRecycler.setVisibility(View.VISIBLE);
-                        resultAdapter.updateResults(results);
+                        resultAdapter.updateResults(allBooks);
                     } else {
-                        emptyStateText.setVisibility(View.VISIBLE);
+                        updateEmptyState();
                     }
+                    applyFilters();
                 });
     }
 

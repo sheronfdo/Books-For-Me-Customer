@@ -1,5 +1,6 @@
 package com.jamith.booksformecustomer.adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.SearchResultsActivity;
 import com.jamith.booksformecustomer.model.Category;
 
 import java.util.List;
@@ -33,6 +35,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categories.get(position);
         Glide.with(holder.itemView).load(category.getImageUrl()).into(holder.categoryImage);
         holder.categoryName.setText(category.getName());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), SearchResultsActivity.class);
+                intent.putExtra("isCategory", true);
+                intent.putExtra("categoryId", category.getCategoryId());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
