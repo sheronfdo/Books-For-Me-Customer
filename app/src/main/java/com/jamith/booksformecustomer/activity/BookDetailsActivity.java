@@ -52,7 +52,6 @@ public class BookDetailsActivity extends AppCompatActivity {
 
         BookItem bookItem = (BookItem) getIntent().getSerializableExtra("selected_book");
 
-        // Find views by ID
         ImageView coverImage = findViewById(R.id.book_cover_image);
         TextView title = findViewById(R.id.book_title);
         TextView author = findViewById(R.id.book_author);
@@ -70,7 +69,6 @@ public class BookDetailsActivity extends AppCompatActivity {
         ImageView sellerImage = findViewById(R.id.seller_image);
         ImageView contactDetails = findViewById(R.id.contact_details);
 
-        // Set data to views
         Glide.with(this).load(bookItem.getImageUrl()).into(coverImage);
         title.setText(bookItem.getTitle());
         author.setText(bookItem.getAuthor());
@@ -97,9 +95,9 @@ public class BookDetailsActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            String sellerNameText = document.getString("fullNameOrRepresentative"); // Adjust according to your seller model
-                            String sellerImageUrl = document.getString("imageUrl"); // Adjust according to your seller model
-                            String contactNumber = document.getString("phoneNumber"); // Adjust according to your seller model
+                            String sellerNameText = document.getString("fullNameOrRepresentative");
+                            String sellerImageUrl = document.getString("imageUrl");
+                            String contactNumber = document.getString("phoneNumber");
 
                             sellerName.setText(sellerNameText);
                             Glide.with(this).load(sellerImageUrl).into(sellerImage);
@@ -118,7 +116,6 @@ public class BookDetailsActivity extends AppCompatActivity {
                     }
                 });
 
-        // Set click listeners
         addToCartButton.setOnClickListener(v -> {
             addToCart(bookItem);
         });

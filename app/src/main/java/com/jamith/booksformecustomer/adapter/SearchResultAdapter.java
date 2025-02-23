@@ -1,5 +1,6 @@
 package com.jamith.booksformecustomer.adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.SearchItemsActivity;
 import com.jamith.booksformecustomer.model.Book;
 
 import java.util.ArrayList;
@@ -38,15 +40,14 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         holder.title.setText(book.getTitle());
         holder.author.setText(book.getAuthor());
 
-
-
-        // Load image using Glide/Picasso
         Glide.with(holder.itemView.getContext())
                 .load(book.getCoverImage())
                 .into(holder.bookImage);
 
         holder.viewDetailsButton.setOnClickListener(v -> {
-            // Handle navigation to book details
+            Intent intent = new Intent(v.getContext(), SearchItemsActivity.class);
+            intent.putExtra("BOOK_ID", book.getId()); // Pass only book ID
+            v.getContext().startActivity(intent);
         });
     }
 

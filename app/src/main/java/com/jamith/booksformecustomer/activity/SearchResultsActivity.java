@@ -206,7 +206,9 @@ public class SearchResultsActivity extends AppCompatActivity {
                     suggestionsRecycler.setVisibility(View.GONE);
                     allBooks = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        allBooks.add(doc.toObject(Book.class));
+                        Book book = doc.toObject(Book.class);
+                        book.setId(doc.getId());
+                        allBooks.add(book);
                     }
                     if (!allBooks.isEmpty()) {
                         resultsRecycler.setVisibility(View.VISIBLE);
