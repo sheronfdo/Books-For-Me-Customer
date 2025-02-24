@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                         startActivity(intent);
+
                     } else {
                         firebaseAuthenticate(token);
                     }

@@ -48,6 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="4dp"
+                    android:fontFamily="@font/montserrat_bold"
                     android:text="Change Image" />
 
                 <TextView
@@ -61,18 +62,21 @@
                     android:id="@+id/profile_info_et_first_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
                     android:hint="First Name" />
 
                 <EditText
                     android:id="@+id/profile_info_et_last_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
                     android:hint="Last Name" />
 
                 <EditText
                     android:id="@+id/profile_info_et_display_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
                     android:hint="Display Name" />
 
                 <EditText
@@ -80,12 +84,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="false"
+                    android:fontFamily="@font/montserrat_bold"
                     android:hint="Email" />
 
                 <EditText
                     android:id="@+id/profile_info_et_phone_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_bold"
                     android:hint="Phone Number" />
 
                 <!-- Save Changes Button -->
@@ -94,6 +100,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:fontFamily="@font/montserrat_bold"
                     android:text="Save Changes" />
             </LinearLayout>
         </ScrollView>

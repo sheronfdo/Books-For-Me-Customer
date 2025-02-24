@@ -13,26 +13,16 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/montserrat_bold"
         android:text="Order Completed!"
         android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvOrderId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvOrderStatus"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
-        android:text="Order ID: "
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvOrderStatus" />
 
     <TextView
         android:id="@+id/tvTransactionId"
@@ -41,19 +31,46 @@
         android:layout_below="@id/tvOrderId"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
         android:text="Transaction ID: "
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvOrderId" />
 
+    <TextView
+        android:id="@+id/tvOrderId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvOrderStatus"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Order ID: "
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvOrderStatus" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/order_complete" />
+
     <Button
         android:id="@+id/btnContinueShopping"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvTransactionId"
         android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
+        android:layout_margin="16dp"
         android:text="Continue Shopping"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

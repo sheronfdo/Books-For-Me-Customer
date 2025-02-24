@@ -212,7 +212,7 @@ public class CheckoutActivity extends AppCompatActivity {
         paymentStatusDTO.setOrderId(orderResponseDTO.getId());
         paymentStatusDTO.setPaymentStatus(PaymentStatus.PAYMENT_STATUS_COMPLETED);
         paymentStatusDTO.setPaymentDetailsDTO(paymentDetailsDTO);
-
+        Log.d("payment status dto", paymentStatusDTO.toString());
         orderService.paymentStatus(paymentStatusDTO, new OrderService.OrderServiceCallback() {
             @Override
             public void onSuccess(OrderResponseDTO response) {

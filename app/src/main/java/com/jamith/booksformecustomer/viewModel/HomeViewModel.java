@@ -81,12 +81,12 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void fetchTrendingBooks() {
-        long sevenDaysAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000); // 7 days in milliseconds
+        long sevenDaysAgo = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000);
         Timestamp lastWeek = new Timestamp(new Date(sevenDaysAgo));
 
         Log.d("sevenDaysAgo", String.valueOf(sevenDaysAgo));
         Log.d("lastWeek", lastWeek.toString());
-        db.collection("orders").whereGreaterThanOrEqualTo("createdAt", lastWeek) // Fetch recent orders
+        db.collection("orders").whereGreaterThanOrEqualTo("createdAt", lastWeek)
                 .get().addOnSuccessListener(querySnapshot -> {
                     Map<String, Integer> trendingBooksMap = new HashMap<>();
                     List<Task<QuerySnapshot>> orderItemTasks = new ArrayList<>();
