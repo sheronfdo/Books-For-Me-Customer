@@ -67,4 +67,5 @@ dependencies {
     implementation("com.hbb20:ccp:2.5.1")
     implementation("com.paypal.sdk:paypal-android-sdk:2.16.0")
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.airbnb.android:lottie:6.6.2")
 }
