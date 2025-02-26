@@ -31,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 //tasks.whenTaskAdded {
@@ -68,4 +71,11 @@ dependencies {
     implementation("com.paypal.sdk:paypal-android-sdk:2.16.0")
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.airbnb.android:lottie:6.6.2")
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    androidTestImplementation("org.mockito:mockito-android:5.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("org.mockito:mockito-android:5.3.1")
+    androidTestImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
 }

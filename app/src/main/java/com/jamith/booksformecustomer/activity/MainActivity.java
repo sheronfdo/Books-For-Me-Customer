@@ -35,12 +35,12 @@ import com.jamith.booksformecustomer.service.MessageService;
 
 public class MainActivity extends AppCompatActivity {
 
-    FirebaseAuth firebaseAuth;
+    public FirebaseAuth firebaseAuth;
     Button buttonGoogle;
     ProgressBar progressBar;
-    FirebaseFirestore firebaseFirestore;
-    GoogleSignInClient googleSignInClient;
-    private int RC_SIGN_IN = 100;
+    public FirebaseFirestore firebaseFirestore;
+    public GoogleSignInClient googleSignInClient;
+    int RC_SIGN_IN = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void firebaseAuthenticate(String token) {
+    public void firebaseAuthenticate(String token) {
         AuthCredential authCredential = GoogleAuthProvider.getCredential(token, null);
         firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -164,7 +164,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
 }
