@@ -1,6 +1,8 @@
 package com.jamith.booksformecustomer.util;
 
 
-public enum PaymentStatus {
+import java.io.Serializable;
+
+public enum PaymentStatus implements Serializable {
     PAYMENT_STATUS_CANCELLED, PAYMENT_STATUS_COMPLETED, PAYMENT_STATUS_FAILED, PAYMENT_PENDING;
 }

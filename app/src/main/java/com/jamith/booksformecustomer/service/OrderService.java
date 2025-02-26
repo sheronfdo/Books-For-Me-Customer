@@ -75,7 +75,9 @@ public class OrderService {
 
     public void paymentStatus(PaymentStatusDTO orderDTO, OrderServiceCallback callback) {
         String jsonData = gson.toJson(orderDTO);
+        Log.d("jsonData", jsonData);
         RequestBody body = RequestBody.create(jsonData, JSONMediaType);
+        Log.d("API URL", UrlConstants.PAYMENT_STATUS_URL);
         Request request = new Request.Builder()
                 .url(UrlConstants.PAYMENT_STATUS_URL)
                 .post(body)

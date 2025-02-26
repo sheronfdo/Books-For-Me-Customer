@@ -48,6 +48,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private Set<String> selectedCategoryIds = new HashSet<>();
     private List<Book> allBooks = new ArrayList<>();
     private FilterBottomSheetDialogFragment bottomSheet;
+    private ImageButton backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +129,8 @@ public class SearchResultsActivity extends AppCompatActivity {
             performSearch();
         }
 
+        backButton = findViewById(R.id.activity_search_results_back_button);
+        backButton.setOnClickListener(view->finish());
     }
 
     private void showFilterBottomSheet() {

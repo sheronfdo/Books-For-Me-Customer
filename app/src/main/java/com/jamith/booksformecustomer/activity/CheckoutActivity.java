@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,13 +51,13 @@ public class CheckoutActivity extends AppCompatActivity {
     private TextView orderTotal;
     private EditText nameInput, addressInput, phoneInput, emailInput;
     private Button placeOrderButton;
+    private ImageButton backButton;
     private CountryCodePicker countryCodePicker;
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private double totalAmount = 0.0;
 
     OrderResponseDTO orderResponseDTO;
     PayPalConfiguration config;
-
     String clientId;
 
     @Override
@@ -98,6 +99,9 @@ public class CheckoutActivity extends AppCompatActivity {
                 placeOrder();
             }
         });
+
+        backButton = findViewById(R.id.activity_checkout_back_button);
+        backButton.setOnClickListener(v->finish());
     }
 
     private void calculateTotalAmount() {
@@ -163,7 +167,6 @@ public class CheckoutActivity extends AppCompatActivity {
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
         intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
         startActivityForResult(intent, PAYPAL_REQUEST_CODE);
-
     }
 
     @Override
@@ -221,8 +224,8 @@ public class CheckoutActivity extends AppCompatActivity {
                 String transactionId = paymentDetailsDTO.getPaymentId();
                 String orderId = orderResponseDTO.getId();
 
-                // Navigate to OrderCompletionActivity
                 Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                intent.putExtra("is_success", true);
                 intent.putExtra("order_id", orderId);
                 intent.putExtra("transaction_id", transactionId);
                 startActivity(intent);
@@ -232,11 +235,21 @@ public class CheckoutActivity extends AppCompatActivity {
             @Override
             public void onError(String errorMessage) {
                 Log.e("order failed", errorMessage.toString());
+                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                intent.putExtra("is_success", false);
+                intent.putExtra("order_id", orderResponseDTO.getId());
+                startActivity(intent);
+                finish();
             }
 
             @Override
             public void onFailure(String failureMessage) {
                 Log.e("order failed", failureMessage.toString());
+                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                intent.putExtra("is_success", false);
+                intent.putExtra("order_id", orderResponseDTO.getId());
+                startActivity(intent);
+                finish();
             }
         });
     }

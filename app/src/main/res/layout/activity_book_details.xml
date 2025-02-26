@@ -7,8 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".activity.BookDetailsActivity">
 
-    <!-- res/layout/activity_book_details.xml -->
+    <ImageButton
+        android:id="@+id/activity_book_details_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:elevation="2dp"
+        android:src="@drawable/arrow_back_24px"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/buy_now_button"
@@ -272,11 +282,11 @@
                     android:layout_height="40dp"
                     android:layout_margin="8dp"
                     android:contentDescription="Contact Seller"
-                    app:tint="@color/black"
+                    android:src="@drawable/call_24px"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:src="@drawable/call_24px" />
+                    app:tint="@color/black" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -307,4 +317,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/add_to_cart_button" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

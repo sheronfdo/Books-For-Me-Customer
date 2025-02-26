@@ -3,6 +3,7 @@ package com.jamith.booksformecustomer.activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
@@ -29,6 +30,7 @@ public class SearchItemsActivity extends AppCompatActivity {
     private SearchResultsItemAdapter adapter;
     private String bookImageUrl;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ImageButton backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,8 @@ public class SearchItemsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.searchResultsRvStocks);
         progressBar = findViewById(R.id.searchResultsProgressBar);
         String bookId = getIntent().getStringExtra("BOOK_ID");
+        backButton = findViewById(R.id.activity_search_items_back_button);
+        backButton.setOnClickListener(view->finish());
         setupRecyclerView();
         fetchBookDetails(bookId);
     }

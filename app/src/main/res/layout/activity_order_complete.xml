@@ -54,6 +54,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvOrderStatus" />
 
     <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/orderStatusAnimation"
         android:layout_width="250dp"
         android:layout_height="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -61,8 +62,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/order_complete" />
+        app:lottie_loop="true" />
 
     <Button
         android:id="@+id/btnContinueShopping"

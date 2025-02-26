@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +20,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamith.booksformecustomer.R;
 import com.jamith.booksformecustomer.model.BookItem;
@@ -37,7 +38,9 @@ public class BookDetailsActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
     ModelMapper modelMapper = new ModelMapper();
-
+    ImageButton backButton;
+    Button buyNowButton;
+    Button addToCartButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +66,8 @@ public class BookDetailsActivity extends AppCompatActivity {
         TextView language = findViewById(R.id.book_language);
         TextView tags = findViewById(R.id.book_tags);
         TextView featured = findViewById(R.id.book_featured);
-        Button addToCartButton = findViewById(R.id.add_to_cart_button);
-        Button buyNowButton = findViewById(R.id.buy_now_button);
+        addToCartButton = findViewById(R.id.add_to_cart_button);
+        buyNowButton = findViewById(R.id.buy_now_button);
         TextView sellerName = findViewById(R.id.seller_name);
         ImageView sellerImage = findViewById(R.id.seller_image);
         ImageView contactDetails = findViewById(R.id.contact_details);
@@ -129,6 +132,13 @@ public class BookDetailsActivity extends AppCompatActivity {
             Intent intent = new Intent(BookDetailsActivity.this, CheckoutActivity.class);
             intent.putExtra("selectedCartItems", (Serializable) selectedItems);
             startActivity(intent);
+        });
+        backButton = findViewById(R.id.activity_book_details_back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
         });
     }
 

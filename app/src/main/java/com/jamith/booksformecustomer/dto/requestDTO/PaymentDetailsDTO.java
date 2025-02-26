@@ -1,9 +1,11 @@
 package com.jamith.booksformecustomer.dto.requestDTO;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class PaymentDetailsDTO
+public class PaymentDetailsDTO  implements Serializable
 {
     private String paymentId;
     private String paymentStatus;
