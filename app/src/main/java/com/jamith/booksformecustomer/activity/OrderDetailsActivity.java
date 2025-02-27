@@ -3,6 +3,8 @@ package com.jamith.booksformecustomer.activity;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -32,6 +34,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
     private LinearLayout order_summary, statusTimeline, order_Item;
     private ProgressBar progressBar;
     private TextView orderConfirmed, paymentPending, processing, shipped, delivered, orderCompleted;
+    private ImageButton backButton;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -53,12 +56,13 @@ public class OrderDetailsActivity extends AppCompatActivity {
         delivered = findViewById(R.id.delivered);
         orderCompleted = findViewById(R.id.order_completed);
 
-
+        backButton = findViewById(R.id.activity_order_details_back_button);
+        backButton.setOnClickListener(v -> finish());
 
         db.collection("orders").document(orderItem.getOrderId()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     Order order = task.getResult().toObject(Order.class);
                     order.setOrderId(orderItem.getOrderId());
                     setupOrderSummary(order);
@@ -80,11 +84,19 @@ public class OrderDetailsActivity extends AppCompatActivity {
         TextView orderDate = findViewById(R.id.order_date);
         TextView totalPrice = findViewById(R.id.total_price);
         TextView paymentStatus = findViewById(R.id.payment_status);
+        TextView recieverName = findViewById(R.id.recieverName);
+        TextView recieverEmail = findViewById(R.id.recieverEmail);
+        TextView recieverPhoneNumber = findViewById(R.id.recieverPhoneNumber);
+        TextView recieverAddress = findViewById(R.id.recieverAddress);
 
         orderId.setText("Order ID: " + order.getOrderId());
         orderDate.setText("Order Date: " + order.getOrderDate());
         totalPrice.setText("Total Price: $" + order.getTotalPrice());
         paymentStatus.setText("Payment Status: " + order.getPaymentStatus());
+        recieverName.setText("Name: " + order.getRecieverName());
+        recieverEmail.setText("Email: " + order.getRecieverEmail());
+        recieverPhoneNumber.setText("Phone Number: " + order.getRecieverPhoneNumber());
+        recieverAddress.setText("Address: " + order.getRecieverAddress());
     }
 
     private void setupOrderItems(OrderItem orderItems) {
@@ -111,6 +123,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
             if (statusNames[i].equals(status)) {
                 textView.setTextColor(Color.GREEN);
                 progress = (i + 1) * (100 / statuses.length);
+                textView.setVisibility(View.VISIBLE);
                 break;
             }
         }

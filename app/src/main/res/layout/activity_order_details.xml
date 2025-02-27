@@ -7,21 +7,37 @@
     android:layout_height="match_parent"
     tools:context=".activity.OrderDetailsActivity">
 
+    <ImageButton
+        android:id="@+id/activity_order_details_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:elevation="2dp"
+        android:src="@drawable/arrow_back_24px"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <include layout="@layout/order_summary" android:id="@+id/order_summary" />
+        <include
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/order_details_order_item"
+            layout="@layout/order_details_order_item"
+            android:layout_marginTop="16dp"/>
 
-<!--        <androidx.recyclerview.widget.RecyclerView-->
-<!--            android:id="@+id/recycler_view"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content" />-->
-        <include layout="@layout/order_details_order_item" android:id="@+id/order_details_order_item"/>
+        <include
+            android:id="@+id/status_timeline"
+            layout="@layout/status_timeline" />
 
-        <include layout="@layout/status_timeline" android:id="@+id/status_timeline"/>
+        <include android:id="@+id/order_summary"
+            layout="@layout/order_summary"  />
+
+
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

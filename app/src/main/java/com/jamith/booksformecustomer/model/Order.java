@@ -17,4 +17,8 @@ public class Order {
     private double totalPrice;
     private String paymentStatus;
     private String status;
+    private String recieverAddress;
+    private String recieverEmail;
+    private String recieverName;
+    private String recieverPhoneNumber;
 }
