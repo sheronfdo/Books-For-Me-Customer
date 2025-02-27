@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/person_24px"
         android:title="Profile"/>
+
+    <item
+        android:id="@+id/nav_theme"
+        android:title="Theme Mode"
+        android:icon="@drawable/dark_mode_24px"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/nav_logout"

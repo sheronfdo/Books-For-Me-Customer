@@ -1,5 +1,6 @@
 package com.jamith.booksformecustomer.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -53,11 +55,14 @@ public class HomeActivity extends AppCompatActivity {
     private TextView navHeaderName;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    private static final String PREFS_NAME = "ThemePrefs";
+    private static final String THEME_MODE_KEY = "theme_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        applyTheme();
         setContentView(R.layout.activity_home);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -99,6 +104,8 @@ public class HomeActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_profile) {
                 loadFragment(new ProfileInfoFragment());
+            } else if (item.getItemId() == R.id.nav_theme) {
+                showThemeSelectionDialog();
             } else if (item.getItemId() == R.id.nav_logout) {
                 firebaseAuth.signOut();
                 startActivity(new Intent(this, MainActivity.class));
@@ -111,6 +118,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private final long IMAGE_EXPIRY_DURATION = 24 * 60 * 60 * 1000;
+
     private void loadProfileData() {
         if (firebaseAuth.getCurrentUser() != null) {
             String userId = firebaseAuth.getCurrentUser().getUid();
@@ -157,7 +165,8 @@ public class HomeActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                    }
                 });
     }
 
@@ -169,13 +178,43 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    private void showThemeSelectionDialog() {
+        String[] themes = {"System Default", "Light Mode", "Dark Mode"};
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int currentMode = prefs.getInt(THEME_MODE_KEY, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        int checkedItem = (currentMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) ? 0 :
+                (currentMode == AppCompatDelegate.MODE_NIGHT_NO) ? 1 : 2;
 
+        new AlertDialog.Builder(this)
+                .setTitle("Choose Theme")
+                .setSingleChoiceItems(themes, checkedItem, (dialog, which) -> {
+                    int selectedMode;
+                    if (which == 0) {
+                        selectedMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                    } else if (which == 1) {
+                        selectedMode = AppCompatDelegate.MODE_NIGHT_NO;
+                    } else {
+                        selectedMode = AppCompatDelegate.MODE_NIGHT_YES;
+                    }
+                    prefs.edit().putInt(THEME_MODE_KEY, selectedMode).apply();
+                    AppCompatDelegate.setDefaultNightMode(selectedMode);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void applyTheme() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int themeMode = prefs.getInt(THEME_MODE_KEY, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        AppCompatDelegate.setDefaultNightMode(themeMode);
+    }
 
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment).commit();
     }
 
-    public void setFragmentHome(){
+    public void setFragmentHome() {
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
     }
 }

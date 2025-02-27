@@ -15,8 +15,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="@android:color/darker_gray"/>
+            android:background="@color/primaryColor"
+            android:scaleType="centerCrop" />
 
         <View
             android:layout_width="match_parent"
@@ -49,9 +49,10 @@
             android:layout_toStartOf="@+id/imgBookCover"
             android:ellipsize="end"
             android:maxLines="1"
+            android:backgroundTint="@color/defaultBorderFlagColor"
             android:text="Book Title"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -67,6 +68,6 @@
             android:text="Graham"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="italic|bold" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

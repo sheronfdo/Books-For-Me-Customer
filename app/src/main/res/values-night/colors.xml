@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <color name="black">#FFFFFFFF</color> <!-- White in dark mode -->
+    <color name="white">#FF000000</color> <!-- Black in dark mode -->
+    <color name="primaryColor">#BB86FC</color>
+    <color name="secondaryColor">#757575</color>
+    <color name="background">#121212</color>
+    <color name="textColor">#FFFFFF</color>
+</resources>
