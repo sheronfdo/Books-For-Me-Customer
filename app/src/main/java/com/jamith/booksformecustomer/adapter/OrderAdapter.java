@@ -1,5 +1,6 @@
 package com.jamith.booksformecustomer.adapter;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.OrderDetailsActivity;
 import com.jamith.booksformecustomer.model.OrderItem;
 import com.jamith.booksformecustomer.util.OrderStatus;
 
@@ -43,6 +45,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderItemVie
         holder.price.setText(Double.toString(orderItem.getPrice()));
         holder.quantity.setText(Integer.toString(orderItem.getQuantity()));
         holder.status.setText(OrderStatus.valueOf(orderItem.getStatus()).toString());
+        holder.itemView.setOnClickListener(n->{
+            Intent intent = new Intent(n.getContext(), OrderDetailsActivity.class);
+            intent.putExtra("orderItem", orderItem);
+            n.getContext().startActivity(intent);
+        });
 
     }
 
