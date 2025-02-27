@@ -2,6 +2,9 @@ package com.jamith.booksformecustomer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -60,6 +63,10 @@ public class CheckoutActivity extends AppCompatActivity {
     PayPalConfiguration config;
     String clientId;
 
+    private ImageButton btnGetLiveLocation;
+
+    private static final int MAP_REQUEST_CODE = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +109,16 @@ public class CheckoutActivity extends AppCompatActivity {
 
         backButton = findViewById(R.id.activity_checkout_back_button);
         backButton.setOnClickListener(v->finish());
+
+        btnGetLiveLocation = findViewById(R.id.btnGetLiveLocation);
+        btnGetLiveLocation.setOnClickListener(v -> {
+            Intent intent = new Intent(CheckoutActivity.this, MapActivity.class);
+            startActivityForResult(intent, MAP_REQUEST_CODE);
+        });
+
     }
+
+
 
     private void calculateTotalAmount() {
         totalAmount = 0.0;
@@ -205,6 +221,10 @@ public class CheckoutActivity extends AppCompatActivity {
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(CheckoutActivity.this, "Payment Canceled", Toast.LENGTH_SHORT).show();
             }
+        }
+        if (requestCode == MAP_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            String selectedAddress = data.getStringExtra("selected_address");
+            addressInput.setText(selectedAddress);
         }
     }
 

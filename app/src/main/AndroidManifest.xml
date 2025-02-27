@@ -3,12 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.camera" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +28,9 @@
         android:theme="@style/Theme.BooksForMeCustomer"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.MapActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.OrderDetailsActivity"
             android:exported="false" />
@@ -66,6 +76,13 @@
         <meta-data
             android:name="com.paypal.sdk.clientId"
             android:value="@string/paypal_client_id" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBP4kx90i7D52dEUd_KhYfq-kl1CaxM9uM" />
+
+        <meta-data
+            android:name="com.google.android.geo.MAP_ID"
+            android:value="818ce66144e22216" />
     </application>
 
 </manifest>

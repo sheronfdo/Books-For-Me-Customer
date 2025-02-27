@@ -43,11 +43,35 @@
             android:layout_height="wrap_content"
             android:hint="Full Name" />
 
-        <EditText
-            android:id="@+id/address_input"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Address" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/address_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Address"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnGetLiveLocation"
+                />
+
+            <ImageButton
+                android:id="@+id/btnGetLiveLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/background"
+                android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/address_input"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/address_input"
+                app:srcCompat="@drawable/location_on_24px" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
