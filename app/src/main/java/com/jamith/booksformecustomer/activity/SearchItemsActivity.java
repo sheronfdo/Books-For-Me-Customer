@@ -58,6 +58,7 @@ public class SearchItemsActivity extends AppCompatActivity {
     }
 
     private void fetchBookDetails(String bookId) {
+        Log.d("FetchBookDetails", "Fetching book details for book ID: " + bookId);
         db.collection("books").document(bookId).get().addOnSuccessListener(documentSnapshot -> {
             Book book = documentSnapshot.toObject(Book.class);
             if (book != null) {

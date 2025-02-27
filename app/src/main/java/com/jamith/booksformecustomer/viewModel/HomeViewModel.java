@@ -81,17 +81,20 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void fetchTrendingBooks() {
-        long sevenDaysAgo = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000);
+        long sevenDaysAgo = System.currentTimeMillis() - (7l * 24 * 60 * 60 * 1000);
         Timestamp lastWeek = new Timestamp(new Date(sevenDaysAgo));
 
         Log.d("sevenDaysAgo", String.valueOf(sevenDaysAgo));
         Log.d("lastWeek", lastWeek.toString());
-        db.collection("orders").whereGreaterThanOrEqualTo("createdAt", lastWeek)
+
+        db.collection("orders")
+                .whereGreaterThanOrEqualTo("createdAt", lastWeek)
                 .get().addOnSuccessListener(querySnapshot -> {
+
+                    Log.d("querySnapshot", Integer.toString(querySnapshot.getDocuments().size()));
                     Map<String, Integer> trendingBooksMap = new HashMap<>();
                     List<Task<QuerySnapshot>> orderItemTasks = new ArrayList<>();
 
-                    // Fetch orderItem subcollections from recent orders
                     for (DocumentSnapshot orderDoc : querySnapshot.getDocuments()) {
                         Task<QuerySnapshot> orderItemTask = orderDoc.getReference().collection("orderItems").get();
                         orderItemTasks.add(orderItemTask);
@@ -136,16 +139,15 @@ public class HomeViewModel extends ViewModel {
             db.collection("books").document(bookId).get().addOnSuccessListener(document -> {
                 Book book = document.toObject(Book.class);
                 if (book != null) {
+                    book.setId(bookId);
                     books.add(book);
                 }
-
-                // Check if all books are processed
                 if (books.size() == bookIds.size()) {
                     booksLiveData.setValue(books);
                 }
             }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching book details", e));
+            Log.d("books", books.toString());
         }
-        Log.d("books", books.toString());
     }
 
     public void fetchCategories() {
@@ -170,7 +172,7 @@ public class HomeViewModel extends ViewModel {
             return;
         }
         List<Category> shuffledCategories = new ArrayList<>(categories);
-        Collections.shuffle(shuffledCategories); // Shuffle the copied list
+        Collections.shuffle(shuffledCategories);
         List<Category> selectedCategories = shuffledCategories.subList(0, Math.min(count, shuffledCategories.size()));
         Category[] randomCategoriesArray = selectedCategories.toArray(new Category[0]);
         randomCategories.setValue(randomCategoriesArray);

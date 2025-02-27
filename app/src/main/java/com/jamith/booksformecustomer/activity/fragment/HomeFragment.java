@@ -52,7 +52,7 @@ public class HomeFragment extends Fragment {
 
         carouselView = view.findViewById(R.id.carousel_view);
         homeViewModel.getBooksLiveData().observe(getViewLifecycleOwner(), books -> {
-            Log.d("BooksFetched", "fetched");
+            Log.d("BooksFetched", "fetched "+books.size());
             TrendingBooksAdapter trendingBooksAdapter = new TrendingBooksAdapter(books);
             carouselView.setAdapter(trendingBooksAdapter);
         });

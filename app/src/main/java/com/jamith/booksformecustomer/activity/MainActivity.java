@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void firebaseAuthenticate(String token) {
+        Log.d("Token", token);
         AuthCredential authCredential = GoogleAuthProvider.getCredential(token, null);
         firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override

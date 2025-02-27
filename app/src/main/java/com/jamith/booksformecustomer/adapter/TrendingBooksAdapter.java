@@ -1,6 +1,7 @@
 package com.jamith.booksformecustomer.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.jamith.booksformecustomer.R;
+import com.jamith.booksformecustomer.activity.SearchItemsActivity;
 import com.jamith.booksformecustomer.model.Book;
 
 import java.util.List;
@@ -34,10 +36,15 @@ public class TrendingBooksAdapter extends RecyclerView.Adapter<TrendingBooksAdap
         holder.txtBookTitle.setText(book.getTitle());
         holder.txtAuthor.setText(book.getAuthor());
 
-        // Load book cover with Glide
         Glide.with(holder.itemView)
                 .load(book.getCoverImage())
                 .into(holder.imgBookCover);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), SearchItemsActivity.class);
+            intent.putExtra("BOOK_ID", book.getId()); // Pass only book ID
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
