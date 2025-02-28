@@ -2,15 +2,13 @@ package com.jamith.booksformecustomer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +56,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private CountryCodePicker countryCodePicker;
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private double totalAmount = 0.0;
-
+    private ProgressBar progressBar;
     OrderResponseDTO orderResponseDTO;
     PayPalConfiguration config;
     String clientId;
@@ -81,7 +79,8 @@ public class CheckoutActivity extends AppCompatActivity {
         config = new PayPalConfiguration()
                 .environment(PayPalConfiguration.ENVIRONMENT_NO_NETWORK)
                 .clientId(clientId);
-
+        progressBar = findViewById(R.id.activityCheckoutprogressBar);
+        progressBar.setVisibility(View.GONE);
         Log.d("pal client", clientId);
         orderTotal = findViewById(R.id.order_total);
         nameInput = findViewById(R.id.name_input);
@@ -103,12 +102,13 @@ public class CheckoutActivity extends AppCompatActivity {
         placeOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 placeOrder();
             }
         });
 
         backButton = findViewById(R.id.activity_checkout_back_button);
-        backButton.setOnClickListener(v->finish());
+        backButton.setOnClickListener(v -> finish());
 
         btnGetLiveLocation = findViewById(R.id.btnGetLiveLocation);
         btnGetLiveLocation.setOnClickListener(v -> {
@@ -117,7 +117,6 @@ public class CheckoutActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     private void calculateTotalAmount() {
@@ -161,11 +160,13 @@ public class CheckoutActivity extends AppCompatActivity {
 
             @Override
             public void onError(String errorMessage) {
+                progressBar.setVisibility(View.GONE);
                 Log.e("order failed", errorMessage.toString());
             }
 
             @Override
             public void onFailure(String failureMessage) {
+                progressBar.setVisibility(View.GONE);
                 Log.e("order failed", failureMessage.toString());
             }
         });
@@ -239,37 +240,45 @@ public class CheckoutActivity extends AppCompatActivity {
         orderService.paymentStatus(paymentStatusDTO, new OrderService.OrderServiceCallback() {
             @Override
             public void onSuccess(OrderResponseDTO response) {
-                Log.d("order success", response.toString());
-                orderResponseDTO = response;
-                String transactionId = paymentDetailsDTO.getPaymentId();
-                String orderId = orderResponseDTO.getId();
-
-                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
-                intent.putExtra("is_success", true);
-                intent.putExtra("order_id", orderId);
-                intent.putExtra("transaction_id", transactionId);
-                startActivity(intent);
-                finish();
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Log.d("order success", response.toString());
+                    orderResponseDTO = response;
+                    String transactionId = paymentDetailsDTO.getPaymentId();
+                    String orderId = orderResponseDTO.getId();
+                    Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                    intent.putExtra("is_success", true);
+                    intent.putExtra("order_id", orderId);
+                    intent.putExtra("transaction_id", transactionId);
+                    startActivity(intent);
+                    finish();
+                });
             }
 
             @Override
             public void onError(String errorMessage) {
-                Log.e("order failed", errorMessage.toString());
-                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
-                intent.putExtra("is_success", false);
-                intent.putExtra("order_id", orderResponseDTO.getId());
-                startActivity(intent);
-                finish();
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Log.e("order failed", errorMessage.toString());
+                    Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                    intent.putExtra("is_success", false);
+                    intent.putExtra("order_id", orderResponseDTO.getId());
+                    startActivity(intent);
+                    finish();
+                });
             }
 
             @Override
             public void onFailure(String failureMessage) {
-                Log.e("order failed", failureMessage.toString());
-                Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
-                intent.putExtra("is_success", false);
-                intent.putExtra("order_id", orderResponseDTO.getId());
-                startActivity(intent);
-                finish();
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Log.e("order failed", failureMessage.toString());
+                    Intent intent = new Intent(CheckoutActivity.this, OrderCompleteActivity.class);
+                    intent.putExtra("is_success", false);
+                    intent.putExtra("order_id", orderResponseDTO.getId());
+                    startActivity(intent);
+                    finish();
+                });
             }
         });
     }
